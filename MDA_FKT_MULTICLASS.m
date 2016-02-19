@@ -18,7 +18,7 @@ for ii = 1 : size(A_train,3)
     n_train(ii,1) = size(A_train{ii},2) ;
 end
 
-%% STEP 1 
+%% STEP 1   - EXTRA & INTRA CLASS MATRICES
 
 %PART A - COMPUTE H_I
 
@@ -37,14 +37,47 @@ end
 
 H_I = (1/sqrt(N_I) )* H_I ; 
             
-%PART B = 
+%PART B - COMPUTE H_E
 
-        
+
+C = len(A_train);     
+combos = combntns(n_train,2);
+N_E =  nchoosek(C,2)* sum(prod(combos,2));
+
+
+H_E = zeros(D, N_E);
+idx = 1;
+    
+for ii = 1: len(A_train) % loop through first class
+    for jj = ii:len(A_train) % loop through second class
+        for kk = 1:n_train(ii)  % kkth column of first class
+            for pp = 1:n_train(ii)   % ppth column of second class
+    
+            H_E(:,idx) = A_train{ii}(:,kk)-A_train{jj}(:,pp);
+            idx = idx+1;
+            
+            end
+        end
     end
-
-    
-    
 end
+
+%PART C  - COMPUTE H_T
+
+N = sum(n_train);
+H_T = zeros(D,N); 
+
+Stacked = []
+for ii = 1:len(A_train)
+
+    Stacked = [Stacked ,  A_train{ii} ] ;
+
+end
+global_avg = mean(Stacked,2); % m 
+H_T = Stacked -  repmat(global_avg,[1,N]);
+
+
+%% STEP 2 - QR DECOMPOSITION
+
 
 
 
