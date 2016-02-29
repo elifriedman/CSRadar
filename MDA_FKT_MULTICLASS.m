@@ -2,12 +2,13 @@
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
 
-[A_train,A_test] = gettraintest(50,[ 5 3 4],10);
+[A_train,A_test] = gettraintest(3,[ 5 3 4],10);
+
 %initialization
-k = 6;
+k = 3;
 C = length(A_train);
 n_train = zeros ( [ C, 1]);
-train_label = (1:C)'; 
+train_label = (1:C)';
 
 
 test_label = A_test(end,:); %not given but used to compute score
@@ -81,8 +82,11 @@ global_avg = mean(Stacked,2); % m
 H_T = Stacked -  repmat(global_avg,[1,N]);
 
 
-%% STEP 2 - QR DECOMPOSITION
-[Q,R] = qr(H_T,0); % Q should be size Dxr where r = rank(H_T)
+%% STEP 2 - Q DECOMPOSITION
+r = rank(H_T);
+[Q,R] = qr(H_T); % Q should be size Dxr where r = rank(H_T)
+Q = Q(:,1:r);
+R = R(1:r,:);
 
 %% STEP 3 - S_tilde
 S_tilde = R*R';
@@ -95,10 +99,10 @@ Sigma_I = N_I/(2*N) * Z*Z';
 
 %% STEP 6 - evecs / vals of S_tilde^-1'*Sigma_I
 P = S_tilde\Sigma_I;
-[V,D] = eig(P);
-
+[V,L] = eig(P);
+% [V,D] = eigs(P,rank(P));
 %% STEP 7 - generalized evals
-d = diag(D);
+d = diag(L);
 lambda = N_I*d./(N_E*(1-d));
 
 %% STEP 8 - sort evecs in decreasing order
@@ -108,7 +112,23 @@ sortstat = lambda + 1./lambda;
 V = V(:,i);
 
 %% STEP 9 - projection matrix
-projmat = Q*V(:,1:k)
+projmat = Q*V(:,1:k);
 
+
+%% TEST
+
+results = projmat*projmat'*A_test;
+
+train = zeros(D,sum(n_train));
+labels = zeros(1,sum(n_train));
+ind = 0;
+for i = 1:C
+    train(:,ind+1:ind+n_train(i)) = A_train{i};
+    labels(ind+1:ind+n_train(i)) = i;
+    ind = ind+n_train(i);
+end
+
+res = knnclassify(A_test',train',labels);
 % end
+
 
