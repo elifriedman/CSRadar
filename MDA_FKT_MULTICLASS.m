@@ -1,11 +1,11 @@
 % function [ projmat ] = MDA_FKT_MULTICLASS( A_train,  A_test, k)
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
-
-[A_train,A_test] = gettraintest(3,[ 5 3 4],10);
+clc; clear all; close all; 
+[A_train,A_test] = gettraintest(100,[ 50 50 50],100);
 
 %initialization
-k = 3;
+k = 68;
 C = length(A_train);
 n_train = zeros ( [ C, 1]);
 train_label = (1:C)';
@@ -99,8 +99,8 @@ Sigma_I = N_I/(2*N) * Z*Z';
 
 %% STEP 6 - evecs / vals of S_tilde^-1'*Sigma_I
 P = S_tilde\Sigma_I;
-[V,L] = eig(P);
-% [V,D] = eigs(P,rank(P));
+% [V,L] = eig(P);
+[V,L] = eigs(P,rank(P));
 %% STEP 7 - generalized evals
 d = diag(L);
 lambda = N_I*d./(N_E*(1-d));
@@ -112,12 +112,13 @@ sortstat = lambda + 1./lambda;
 V = V(:,i);
 
 %% STEP 9 - projection matrix
+if k>size(V,2)
+    k = size(V,2)
+end
 projmat = Q*V(:,1:k);
 
 
-%% TEST
-
-results = projmat*projmat'*A_test;
+%% BASELINE - FEED IN TEST DATA DIRECTLY
 
 train = zeros(D,sum(n_train));
 labels = zeros(1,sum(n_train));
@@ -130,5 +131,27 @@ end
 
 res = knnclassify(A_test',train',labels);
 % end
+test_label = test_label';
+
+conf_matrix_baseline = confusionmat(test_label,res) 
+
+prec_acc_baseline = sum( diag(conf_matrix_baseline) ) / length(test_label)
+
+
+
+
+%% TEST USING NEW PROJECTION MATRIX
+train_proj = projmat*projmat'*train;
+results = projmat*projmat'*A_test;
+
+
+
+res_new = knnclassify(results',train_proj',labels);
+% end
+
+
+conf_matrix_new = confusionmat(test_label,res_new) 
+
+prec_acc_new = sum( diag(conf_matrix_new) ) / sum( length(test_label)) 
 
 
