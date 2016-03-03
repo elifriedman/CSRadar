@@ -1,11 +1,8 @@
-% function [ projmat ] = MDA_FKT_MULTICLASS( A_train,  A_test, k)
+function [ projmat ] = mda_fkt( A_train,  A_test, k)
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
 
-[A_train,A_test] = gettraintest(3,[ 5 3 4],10);
-
 %initialization
-k = 3;
 C = length(A_train);
 n_train = zeros ( [ C, 1]);
 train_label = (1:C)';
@@ -70,7 +67,7 @@ end
 %%PART C  - COMPUTE H_T
 
 N = sum(n_train);
-H_T = zeros(D,N); 
+H_T = zeros(D,N);
 
 Stacked = [];
 for ii = 1:C
@@ -117,18 +114,18 @@ projmat = Q*V(:,1:k);
 
 %% TEST
 
-results = projmat*projmat'*A_test;
-
-train = zeros(D,sum(n_train));
-labels = zeros(1,sum(n_train));
-ind = 0;
-for i = 1:C
-    train(:,ind+1:ind+n_train(i)) = A_train{i};
-    labels(ind+1:ind+n_train(i)) = i;
-    ind = ind+n_train(i);
-end
-
-res = knnclassify(A_test',train',labels);
+% results = projmat*projmat'*A_test;
+% 
+% train = zeros(D,sum(n_train));
+% labels = zeros(1,sum(n_train));
+% ind = 0;
+% for i = 1:C
+%     train(:,ind+1:ind+n_train(i)) = A_train{i};
+%     labels(ind+1:ind+n_train(i)) = i;
+%     ind = ind+n_train(i);
 % end
+% 
+% res = knnclassify(A_test',train',labels);
+end
 
 
