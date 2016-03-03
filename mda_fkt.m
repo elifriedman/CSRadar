@@ -1,15 +1,18 @@
-function [ projmat ] = mda_fkt( A_train,  A_test, k)
+function [ projmat, vals ] = mda_fkt( A_train, k)
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
-%initialization
+% A_train contains a 1xC cell array where C is the number of columns. Each
+% cell contains a D x num_samples matrix where D is dimensionality of data
+% and num_samples is the number of samples in the class.
+%
+
 C = length(A_train);
 n_train = zeros ( [ C, 1]);
 train_label = (1:C)';
 
 
-test_label = A_test(end,:); %not given but used to compute score
-
-A_test = A_test(1:end-1,:); %test matrix
+% test_label = A_test(end,:); %not given but used to compute score
+% A_test = A_test(1:end-1,:); %test matrix
 
 D = size(A_train{1},1);
 
@@ -111,6 +114,7 @@ V = V(:,i);
 if k>size(V,2)
     k = size(V,2)
 end
+vals = sortstat;
 projmat = Q*V(:,1:k);
 
 %% TEST
