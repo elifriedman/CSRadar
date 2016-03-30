@@ -1,4 +1,6 @@
 function [A_train,A_test] = gettraintest(D,ntrain_vec,num_test,ms,vs)
+
+
 C = length(ntrain_vec);
 
 A_train = {};

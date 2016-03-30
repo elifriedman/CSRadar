@@ -1,4 +1,4 @@
-function [ projmat, vals ] = mda_fkt( A_train, k)
+function [ projmat] = mda_fkt( A_train, k)
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
 % A_train contains a 1xC cell array where C is the number of columns. Each
@@ -66,6 +66,8 @@ for ii = 1:C % loop through first class
     end
 end
 
+H_E = 1/sqrt(N_E) * H_E;
+
 %%PART C  - COMPUTE H_T
 
 N = sum(n_train);
@@ -94,7 +96,7 @@ S_tilde = R*R';
 Z = Q'*H_I;
 
 %% STEP 5 - Sigma_I
-Sigma_I = N_I/(2*N) * Z*Z';
+Sigma_I = N_I/(N) * Z*Z';
 
 %% STEP 6 - evecs / vals of S_tilde^-1'*Sigma_I
 P = S_tilde\Sigma_I;
@@ -114,21 +116,6 @@ V = V(:,i);
 if k>size(V,2)
     k = size(V,2)
 end
-vals = sortstat;
 projmat = Q*V(:,1:k);
 
-%% TEST
-
-% results = projmat*projmat'*A_test;
-% 
-% train = zeros(D,sum(n_train));
-% labels = zeros(1,sum(n_train));
-% ind = 0;
-% for i = 1:C
-%     train(:,ind+1:ind+n_train(i)) = A_train{i};
-%     labels(ind+1:ind+n_train(i)) = i;
-%     ind = ind+n_train(i);
-% end
-% 
-% res = knnclassify(A_test',train',labels);
 end
