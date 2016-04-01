@@ -37,7 +37,8 @@ for ii = 1:C % loop through classes
     end
 end
 
-H_I = (1/sqrt(N_I) )* H_I ; 
+H_I = (1/sqrt(N_I) )* (H_I );
+
 
 %PART B - COMPUTE H_E
 
@@ -66,7 +67,8 @@ for ii = 1:C % loop through first class
     end
 end
 
-H_E = 1/sqrt(N_E) * H_E;
+
+H_E = 1/sqrt(N_E) * (H_E ) ; 
 
 %%PART C  - COMPUTE H_T
 
@@ -83,6 +85,24 @@ global_avg = mean(Stacked,2); % m
 H_T = Stacked -  repmat(global_avg,[1,N]);
 
 
+%%
+clc;
+
+% check lemma 2
+Sigma_E = H_E*H_E' ;
+Sigma_I = H_I*H_I' ;
+Sigma_T = H_T*H_T';
+
+[V_i, D_i ] = eig(Sigma_I)
+
+[V_e, D_e] = eig(Sigma_E)
+[Vgen, Dgen] = eig(Sigma_E,Sigma_I)
+
+
+CHECK_LEMMA_2 =  (N*Sigma_T - N_E*Sigma_E - N_I*Sigma_I ).^2 ;
+CHECK_LEMMA_2 = sum(CHECK_LEMMA_2(:))
+
+
 %% STEP 2 - Q DECOMPOSITION
 r = rank(H_T);
 [Q,R] = qr(H_T); % Q should be size Dxr where r = rank(H_T)
@@ -96,15 +116,19 @@ S_tilde = R*R';
 Z = Q'*H_I;
 
 %% STEP 5 - Sigma_I
-Sigma_I = N_I/(N) * Z*Z';
+Sigma_I_prime = (N_I/(N)) * Z*Z';
 
 %% STEP 6 - evecs / vals of S_tilde^-1'*Sigma_I
-P = S_tilde\Sigma_I;
+P = S_tilde\Sigma_I_prime;
 % [V,L] = eig(P);
 [V,L] = eigs(P,rank(P));
 %% STEP 7 - generalized evals
-d = diag(L);
-lambda = N_I*d./(N_E*(1-d));
+d = diag(L)
+lambda =  N_I*(1-d)./(N_E*d)
+
+
+Nvec = [N, N_I, N_E]
+
 
 %% STEP 8 - sort evecs in decreasing order
 % sorting statistic: lambda + 1/lambda

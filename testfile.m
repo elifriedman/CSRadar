@@ -1,4 +1,5 @@
 %% TOY 1
+clc; clear all; close all;
 C = zeros(3,3,3);
 C(:,:,1) = [1,1,0]'*[1,1,0] + 0.1*[0,1,1]'*[0,1,1];
 C(:,:,2) = [0,1,1]'*[0,1,1] + 0.1*[1,0,1]'*[1,0,1];
@@ -7,7 +8,7 @@ C(:,:,3) = [1,0,1]'*[1,0,1] + 0.1*[1,1,0]'*[1,1,0];
 proj_mat = mda_fkt(A_train,2);
 figure
 hold on
-s = {'ob','.k','xg'};cl
+s = {'ob','.k','xg'};
 for i = 1:3
     plot3(A_train{i}(1,:),A_train{i}(2,:),A_train{i}(3,:),s{i});
 end
@@ -22,20 +23,22 @@ hold off
 
 
 %% TOY 2
-close all; clear all; clc
 
-C(:,:,:) = 0.5*repmat(eye(3,3),1,1,4);
+ clc; clear all ; close all;
+C = 0.5*repmat(eye(3,3),[1,1,4]);
 
 means = zeros(3,4);
-means(:,2) = [1;4;0];
-means(:,3) = [2*sqrt(3);-2;0];
-means(:,4) = [-2*sqrt(3);-2;0];
+means(:,2) = [1;10;0];
+means(:,3) = [20*sqrt(3);-20;0];
+means(:,4) = [-20*sqrt(3);-20;0];
 
-[A_train,A_test] = gettraintest(3,[50 25 25 25],1,means,C);
+[A_train,A_test] = gettraintest(3,[150 50 50 50],1,means,C);
 
 
 A_train{2} = [A_train{2} A_train{3} A_train{4}];
 A_train(:,3:end) = []; % should only have 2 classes, remove extra
+
+
 
 [proj_mat] = mda_fkt(A_train,2);
 
