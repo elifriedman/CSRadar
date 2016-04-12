@@ -119,6 +119,7 @@ Sigma_I_prime = (N_I/(N)) * Z*Z';
 P = S_tilde\Sigma_I_prime;
 % [V,L] = eig(P);
 [V,L] = eigs(P,rank(P));
+
 %% STEP 7 - generalized evals
 d = diag(L);
 lambda =  N_I*(1-d)./(N_E*d);
@@ -129,8 +130,8 @@ Nvec = [N, N_I, N_E];
 %% STEP 8 - sort evecs in decreasing order
 % sorting statistic: lambda + 1/lambda
 sortstat = lambda + 1./lambda;
-[sortstat,i] = sort(sortstat,'descend');
-V = V(:,i);
+[sortstat,p] = sort(sortstat,'ascend');
+V = V(:,p);
 
 %% STEP 9 - projection matrix
 if k>size(V,2)
