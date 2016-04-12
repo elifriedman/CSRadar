@@ -99,7 +99,7 @@ Z = Q'*H_I;
 Sigma_I = N_I/(N) * Z*Z';
 
 %% STEP 6 - evecs / vals of S_tilde^-1'*Sigma_I
-P = S_tilde\Sigma_I;
+P = S_tilde*inv(Sigma_I);
 % [V,L] = eig(P);
 [V,L] = eigs(P,rank(P));
 %% STEP 7 - generalized evals
@@ -109,8 +109,8 @@ lambda = N_I*d./(N_E*(1-d));
 %% STEP 8 - sort evecs in decreasing order
 % sorting statistic: lambda + 1/lambda
 sortstat = lambda + 1./lambda;
-[sortstat,i] = sort(sortstat,'descend');
-V = V(:,i);
+[sortstat,p] = sort(sortstat,'ascend');
+V = V(:,p);
 
 %% STEP 9 - projection matrix
 if k>size(V,2)
