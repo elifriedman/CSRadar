@@ -29,8 +29,8 @@ C = 0.5*repmat(eye(3,3),[1,1,4]);
 
 means = zeros(3,4);
 means(:,2) = [1;10;0];
-means(:,3) = [20*sqrt(3);-20;0];
-means(:,4) = [-20*sqrt(3);-20;0];
+means(:,3) = [2*sqrt(3);-2;0];
+means(:,4) = [-2*sqrt(3);-2;0];
 
 [A_train,A_test] = gettraintest(3,[150 50 50 50],1,means,C);
 
@@ -81,4 +81,4 @@ for i = 1:C
     A_test(end,dim:dim+testsize-1) = i;
 end
     
-proj_mat = mda_fkt(A_train,A_test,2);
+proj_mat = mda_fkt(A_train,2);

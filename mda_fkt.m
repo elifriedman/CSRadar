@@ -85,22 +85,19 @@ global_avg = mean(Stacked,2); % m
 H_T = Stacked -  repmat(global_avg,[1,N]);
 
 
-%%
-clc;
-
 % check lemma 2
-Sigma_E = H_E*H_E' ;
-Sigma_I = H_I*H_I' ;
-Sigma_T = H_T*H_T';
+% Sigma_E = H_E*H_E' ;
+% Sigma_I = H_I*H_I' ;
+% Sigma_T = H_T*H_T';
 
-[V_i, D_i ] = eig(Sigma_I)
+% [V_i, D_i ] = eig(Sigma_I);
+% 
+% [V_e, D_e] = eig(Sigma_E);
+% [Vgen, Dgen] = eig(Sigma_E,Sigma_I);
 
-[V_e, D_e] = eig(Sigma_E)
-[Vgen, Dgen] = eig(Sigma_E,Sigma_I)
 
-
-CHECK_LEMMA_2 =  (N*Sigma_T - N_E*Sigma_E - N_I*Sigma_I ).^2 ;
-CHECK_LEMMA_2 = sum(CHECK_LEMMA_2(:))
+% CHECK_LEMMA_2 =  (N*Sigma_T - N_E*Sigma_E - N_I*Sigma_I ).^2 ;
+% CHECK_LEMMA_2 = sum(CHECK_LEMMA_2(:))
 
 
 %% STEP 2 - Q DECOMPOSITION
@@ -123,11 +120,10 @@ P = S_tilde\Sigma_I_prime;
 % [V,L] = eig(P);
 [V,L] = eigs(P,rank(P));
 %% STEP 7 - generalized evals
-d = diag(L)
-lambda =  N_I*(1-d)./(N_E*d)
+d = diag(L);
+lambda =  N_I*(1-d)./(N_E*d);
 
-
-Nvec = [N, N_I, N_E]
+Nvec = [N, N_I, N_E];
 
 
 %% STEP 8 - sort evecs in decreasing order
@@ -138,7 +134,7 @@ V = V(:,i);
 
 %% STEP 9 - projection matrix
 if k>size(V,2)
-    k = size(V,2)
+    k = size(V,2);
 end
 projmat = Q*V(:,1:k);
 
