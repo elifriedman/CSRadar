@@ -1,87 +1,73 @@
 %% EXPERIMENT  - CLASSIF. ON ORIGINAL FEATURE SPACE     X_original , 
-clc; clear all; close all ; 
-Range_profile = readdata('Rotation_1.csv'); % M by 2048
-%noise
-Range_profile = transpose(Range_profile) ;
+clc; clear all; close all; 
+
+%% Class 1 
+Range_profile = readdata('RotationData/Rotation_1.csv')'; % 2048 x N
+
+N = size(Range_profile,1);
+D = size(Range_profile,2);
 
 
-%%
-mu = mean(Range_profile(:)) ;
+%% Class 2
+N2 = N;
 
-var = std(Range_profile(:))^2 ;
+mu = 1E-5+repmat(mean(Range_profile,1),N2,1); % N2 x D
+var = repmat(std(Range_profile,1).^2,N2,1);
 
-Range_profile_n = mu + sqrt(var/2)* ... 
-           (randn(0.5*size(Range_profile,1),size(Range_profile,2)) + ...  
-            j*randn(0.5*size(Range_profile,1),size(Range_profile,2)));
+Range_profile_n = mu + sqrt(var/2).* ... 
+           (randn([N2,D]) + j*randn([N2,D]));
 
-%%
-X_original = [Range_profile((1:0.5*size(Range_profile,1)),:) ; Range_profile_n ] ;   %2M by N 
-
-X_original = abs(X_original);
-
-T = [ ones( size(Range_profile_n,1) ,1) ; zeros( size(Range_profile_n,1) ,1) ] ;
+%% Split into train and test
+fracTrain = 0.5;
+fracVal = 0.5;
+X = [abs(Range_profile); abs(Range_profile_n)];
+y = [ones(N,1);zeros(N2,1)];
+[Xtrain,Ytrain,Xval,Yval,~,~] = valset(X,y,fracTrain,fracVal);
 
 %%
 %training
-mdl = fitcknn(X_original,T,'NumNeighbors',10) ;
+mdl = fitcknn(Xtrain,Ytrain,'NumNeighbors',10) ;
 
 
-%testing
-RP_test = Range_profile((0.5*size(Range_profile,1)+1:end),:) ;  
-
-Noise_test =  mu + sqrt(var/2)* ... 
-           (randn(0.5*size(Range_profile,1),size(Range_profile,2)) + ...  
-            j*randn(0.5*size(Range_profile,1),size(Range_profile,2))); 
-
-X_test = abs( [RP_test ; Noise_test ]) ; 
-
-[label_test] = predict(mdl,X_test );
-
-score =  sum ( label_test == T ) / length(T) 
+[label_test] = predict(mdl,Xval);
+uncompressed_score =  sum ( label_test == Yval) / length(Yval) 
 
 
 %% MDA_FKT
-C_TRAIN = cell(2,1);
+C_TRAIN = {};
 
-C_TRAIN{1} = abs(Range_profile((1:0.5*size(Range_profile,1)),:)) ; 
+C_TRAIN{1} = Xtrain(Ytrain==1,:)'; 
+C_TRAIN{2} = Xtrain(Ytrain==0,:)'; 
 
-C_TRAIN{2} = abs(Range_profile_n) ; 
-
-
-
-
-[Q_TRAIN,V_TRAIN] = mda_fkt(C_TRAIN) ;
+[Q,V] = mda_fkt(C_TRAIN) ;
 
  
 %%
-C_TEST{1} = abs(RP_test) ; 
 
-C_TEST{2} = abs(Noise_test) ; 
-
-
-
-
-for k = 1:1: size(V,2) 
-
- 
-
-    Proj_Mat = Q*V(:,1:k); 
-
-for i = 1:2
-    C_proj(:,:,i) = C_TEST{i}'*Proj_mat;
+scores = zeros(size(V,2),1);
+for k = 1:size(V,2) 
+    Proj_Mat = abs(Q*V(:,1:k)); 
+    Ctrain = Xtrain*Proj_Mat;
+    Cval = Xval*Proj_Mat;
     
+    mdl_mkt_fda = fitcknn(Ctrain,Ytrain,'NumNeighbors',10) ;
+    label_test_mda = predict(mdl_mkt_fda,Cval);
+
+    scores(k) = sum( label_test_mda == Yval ) / length(Yval);
 end
+%plot(1:length(scores),scores)
+%title('Accuracy vs Supbspace Size');
+%xlabel('Subspace Size');
+%ylabel('Accuracy');
+%figure
+[mx,i] = max(scores);
+fprintf('accuracy: min=%f, mean=%f, max=%f\n',min(scores),mean(scores),max(scores));
+fprintf('best dimension=%d\n',i);
+Proj_Mat = abs(Q*V(:,1:i));
+Ctrain = Xtrain*Proj_Mat;
+plot(Xtrain(Ytrain==1,:)','b');hold on;plot(Xtrain(Ytrain==0,:)','g');
+title('Original Data');
 
-X_test_mkt_fda = abs( [C_TEST{1} ; C_TEST{2} ]) ; 
-mdl_mkt_fda = fitcknn(X_test_mkt_fda,T,'NumNeighbors',10) ;
-[label_test_mda] = predict(mdl_mkt_fda,X_test_mkt_fda );
-
-score_mda =  [sum ( label_test_mda == T ) / length(T)  , k ]
-
-end
-
-
-
-
-
-
+figure
+plot(Ctrain(Ytrain==1,:)','b');hold on;plot(Ctrain(Ytrain==0,:)','g')
+title('Compressed Data');
