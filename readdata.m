@@ -1,4 +1,4 @@
-function [ range_profile_abs ] = readdata( filename )
+function [ range_profile ] = readdata( filename )
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 file = csvread(filename,0,3);
@@ -82,4 +82,3 @@ range_profile = ifft(data_c,ifft_num);
 range_profile_abs = abs(range_profile);
 
 end
-
