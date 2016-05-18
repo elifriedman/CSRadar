@@ -1,4 +1,4 @@
-clear all
+clear all;
 close all;
 clc;
 %simulation data
@@ -6,14 +6,14 @@ clc;
 %strings 
 %{
 6 DIFFERENT ROTATIONS (FOR EACH OF THE 4 POSITIONS)
-20degree_Back
-20degree_Back20degreeClockwise
-20degree_Back20degreeCounterClockwise
-20degree_clockwise
-20degree_counterclockwise
-Norotation
+'20degree_Back'
+'20degree_Back20degreeClockwise'
+'20degree_Back20degreeCounterClockwise'
+'20degree_clockwise'
+'20degree_counterclockwise'
+'Norotation'
 %}
-str =  '20degree_Back20degreeCounterClockwise'
+str = 'Norotation'
 f = openfig(strcat(str,'.fig'));
 Ap  = 0.01;
 H = findobj(f, 'type','line');
@@ -29,8 +29,8 @@ y_data = get(H, 'ydata');
 % x_data_1 = x_data{10};
 % y_data_1 = y_data{10};
 %y=-30cm
-x_data_1 = x_data{2};
-y_data_1 = y_data{2};
+x_data_1 = x_data{1};
+y_data_1 = y_data{1};
 f2 = figure;
 plot(x_data_1, y_data_1,'r','LineWidth',2)
 xlabel('range/m','linewidth',12,'fontsize',10,'Fontname','Timesnewroman','fontWeight','bold');
