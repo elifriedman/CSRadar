@@ -12,7 +12,7 @@ rt(:,1) = 0:N-1; % travel at 1 unit/s
 
 % receiver will be spaced 1 unit away from transmitter along x-axis
 rr = rt;
-rr(:,1) = 1;
+rr(:,1) = rt(:,1) + 1;
 
 % get actual distance
 distance = D(rt,rr,r);
@@ -34,12 +34,12 @@ f = (-K/2:K/2)*1E6; % f0 +/- -2.5 MHz
 
 % use 1 point scatterer at r0
 r0 = [5 5 10];
-t0n,fn = meshgrid(distance/c, f); % t0 should have each row be 1 timestep, f should have each column be 1 freq
+[fn,t0n] = meshgrid(f, distance/c); % t0 should have each row be 1 timestep, f should have each column be 1 freq
 
 s = exp(-2j*pi*(f0+fn).*t0n); % N x K
 
 voxels = [10 10]; % 2D for now
-sigma = zeros(voxels)
+sigma = zeros(voxels);
 for x = 1:voxels(1)
   for y = 1:voxels(2)
     r = [x y 10];
@@ -49,7 +49,7 @@ end
 
 % plot sigma. probably should plot blurring function
 % which subtracts D(r0) inside the argument
-imshow(abs(sigma)); % should have a peak at r0, in the center
-xlabel(1:voxels(1));
-ylabel(1:voxels(2));
-title('Estimation of sigma');
+%imshow(abs(sigma)); % should have a peak at r0, in the center
+%xlabel(1:voxels(1));
+%ylabel(1:voxels(2));
+%title('Estimation of sigma');

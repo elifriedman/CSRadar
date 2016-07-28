@@ -18,4 +18,5 @@ K = 1;
 N = size(rt_n,1);
 r = ones(N,1)*r; % now N x 3
 rt_r = rt_n-r;
-visible = rt_r(:,1).^2 + rt_r(:,2).^2 <= K.^2;
+% visible = rt_r(:,1).^2 + rt_r(:,2).^2 <= K.^2;
+visible = ones(N,1); % always on
