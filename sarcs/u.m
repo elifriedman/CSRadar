@@ -16,7 +16,8 @@ function visible = u(rt,rr,r)
 % is within a certain radius K of rt[n]'s (x,y) coordinate.
 K = 1;
 N = size(rt,1);
-r = ones(N,1)*r; % now N x 3
+R = size(rr,2);
+r = repmat(reshape(r,[1 1 3]),[N 1 1]);
 rt_r = rt-r;
-% visible = rt_r(:,1).^2 + rt_r(:,2).^2 <= K.^2;
+% visible = rt_r(:,1,1).^2 + rt_r(:,1,2).^2 <= K.^2;
 visible = ones(N,1); % always on

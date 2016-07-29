@@ -22,18 +22,18 @@ function blur = B(rt,rr,r,r0,f0,f)
 c = 3E8;
 K = length(f);
 N = size(rt,1);
+R = size(rr,2);
 
-uf = u(rt,rr,r) * ones(1,K); % Nx1 * 1xK = NxK
+uf = repmat(u(rt,rr,r),[1 R K]); % N x R x K
 
 % calculate distances  with or without approximations
-distance = D(rt,rr,r); % Nx1 * 1xK = NxK
-distance0 = D(rt,rr,r0); % Nx1 * 1xK = NxK
+tn = repmat(D(rt,rr,r),[1 1 K])/c;
+tn0 = repmat(D(rt,rr,r0),[1 1 K])/c;
 % distance = D2(rt,rr,r); % Nx1 * 1xK = NxK ## 2nd order approximation
 % distance = D1(rt,rr,r); % Nx1 * 1xK = NxK ## 1st order approximation
 
-[fn,tn] = meshgrid(f, distance/c);
-[fn0,tn0] = meshgrid(f, distance0/c);
+fn = repmat(reshape(f,[1 1 K]),[N R 1]);
 
 N_r = sum(uf(:));
 
-blur = 1/N_r*sum(sum(uf.*exp(2j*pi*(f0+fn).*(tn-tn0))));
+blur = 1/N_r*sum(uf(:).*exp(2j*pi*(f0+fn(:)).*(tn(:)-tn0(:))));
