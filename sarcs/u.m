@@ -1,9 +1,9 @@
-function visible = u(rt_n,rr_n,r)
+function visible = u(rt,rr,r)
 % returns a 1 if point r is illuminated
 % 
 % Let N be the number of timesteps
 %
-% rt_n: a matrix of size N x 3 that contains the position of the transmitter at each
+% rt: a matrix of size N x 3 that contains the position of the transmitter at each
 % timestep
 %
 % rri_n: a matrix of size N x 3 that contains the position of the receivers at each
@@ -15,8 +15,8 @@ function visible = u(rt_n,rr_n,r)
 % for now, I'll assume r[n] is illuminated if it's (x,y) coordinate
 % is within a certain radius K of rt[n]'s (x,y) coordinate.
 K = 1;
-N = size(rt_n,1);
+N = size(rt,1);
 r = ones(N,1)*r; % now N x 3
-rt_r = rt_n-r;
+rt_r = rt-r;
 % visible = rt_r(:,1).^2 + rt_r(:,2).^2 <= K.^2;
 visible = ones(N,1); % always on

@@ -7,7 +7,7 @@ f0 = 5E9; % 2 GHz carrier freq (made up out of thin air)
 x_max = 10; % transmitter travels from 0 up until x_max
 
 % use 1 idealized point scatterer at r0, with sigma(r) = delta(r0)
-r0 = [8 25 40];
+r0 = [2 0 100];
 
 % transmitter travelling along x-axis
 rt = zeros(N,3);
