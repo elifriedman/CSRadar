@@ -3,36 +3,58 @@ clear all; close all;
 
 D = 100; % Dimensionality: can be 50 or 100 to use 1 channel or 2
 K = 10; % K nearest neighbors
+fracTrain = 0.5; % fraction of data to use for training
 
 %% Class 1 
 load(sprintf('cube_d%d.mat',D)); % load data, MM, NN
 M_cube = MM; % # rows
 N_cube = NN; % # columns
-data_cube = data; % D x (M_cube  N_cube)
-N_cube = size(data_cube,2);
+data_cube = data; % D x M_cube x N_cube
+num_cube = size(data_cube,2);
 
 
 %% Class 2
 load(sprintf('corner_d%d.mat',D)); % load data, MM, NN
 M_corner = MM; % # rows
 N_corner = NN; % # columns
-data_corner = data; % D x (M_corner  N_corner)
-N_corner = size(data_corner,2);
+data_corner = data; % D x M_corner x N_corner
+num_corner = size(data_corner,2);
 
-N = N_cube + N_corner;
+num = num_cube + num_corner;
 
-%% Load data
-X = abs([data_cube data_corner])'; % N x D
-X = X - ones(N,1)*mean(X,1);
-X = X ./ (ones(N,1)*var(X,1));
-Y = [zeros(1,N_cube) ones(1,N_corner)]'; % 0 = cube, 1 = corner
+%% Reshape data
+% Combine the returns from each row of measurements
+% into one large dimensional vector of size D*min(N_cube, N_corner)
+
+% data is currently shaped D x M x N
+% we reshape it to (D*N) x M
+% where N is min(N_cube, N_corner), since they have different number of 
+% measurements per row
+
+N_rshp = min(N_cube,N_corner);
+data_cube_rshp = zeros(D*N_rshp, M_cube);
+for i = 1:N_rshp
+    data_cube_rshp(D*(i-1)+1:D*i, :) = data_cube(:,:,i);
+end
+
+data_corner_rshp = zeros(D*N_rshp, M_corner);
+for i = 1:N_rshp
+    data_corner_rshp(D*(i-1)+1:D*i, :) = data_corner(:,:,i);
+end
+
+D = D*N_rshp;
+
+%% Create data matrix
+X = abs([data_cube_rshp data_corner_rshp]).'; % num x D
+X = X - ones(num,1)*mean(X,1);
+X = X ./ (ones(num,1)*var(X,1));
+Y = [zeros(1,num_cube) ones(1,num_corner)].'; % 0 = cube, 1 = corner
 
 %% Split into train and test
-fracTrain = 0.5;
-fracVal = 0.5;
-idx = randperm(N);
-idx_train = idx(1:round(fracTrain*N));
-idx_val = idx(round(fracTrain*N)+1:end);
+fracVal = 1-fracTrain;
+idx = randperm(num);
+idx_train = idx(1:round(fracTrain*num));
+idx_val = idx(round(fracTrain*num)+1:end);
 
 Xtrain = X(idx_train,:);
 Ytrain = Y(idx_train,:);
