@@ -1,7 +1,8 @@
-D = 50;
+D = 100;
 
 MM = 15; % rows
 NN = 15; % columns
+N = 19; % # of datapoints
 
 filename={...
     '15','14','13','12','11','10','9','8','7','6','5','4','3','2','1'...
@@ -20,13 +21,10 @@ filename={...
     ,'208','210','211','212','213','214','215','216','217','218','219','220','221','222','223'...
     ,'239','238','237','236','235','234','233','232','231','230','229','228','227','226','224'};
 
-data = zeros(D,MM,NN);
+data = zeros(D*MM*NN, N);
 
-for m = 1:MM
-    for n = 1:NN
-        ii = MM*(m-1) + n;
-        data(:,m,n) = obtain_cubeNcorner_mat(sprintf('Cube/%s.csv',filename{ii}));
-    end
+for ii = 1:length(filename)
+    data(D*(i-1)+1:D*i,:) = obtain_cubeNcorner_mat(sprintf('Cube/%s.csv',filename{ii}),2);
 end
 
-save('cube_d50.mat','data','MM','NN');
+save(sprintf('cube_d%d.mat',D),'data','MM','NN','N');
