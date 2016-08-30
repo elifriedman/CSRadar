@@ -1,4 +1,4 @@
-D = 100;
+D = 50;
 
 MM = 15; % rows
 NN = 15; % columns
@@ -24,7 +24,7 @@ filename={...
 data = zeros(D*MM*NN, N);
 
 for ii = 1:length(filename)
-    data(D*(i-1)+1:D*i,:) = obtain_cubeNcorner_mat(sprintf('Cube/%s.csv',filename{ii}),2);
+    data(D*(ii-1)+1:D*ii,:) = obtain_cubeNcorner_mat(sprintf('Cube/%s.csv',filename{ii}));
 end
 
 save(sprintf('cube_d%d.mat',D),'data','MM','NN','N');

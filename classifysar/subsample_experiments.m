@@ -1,61 +1,53 @@
 %% EXPERIMENT  - CLASSIF. ON ORIGINAL FEATURE SPACE     X_original , 
 clear all; close all; 
 
-D = 100; % Dimensionality: can be 50 or 100 to use 1 channel or 2
-sub = 0.7; % fraction of frequencies we want to keep
-K = 10; % K nearest neighbors
-fracTrain = 0.5; % fraction of data to use for training
+M = 15;
+N = 15;
+
+meas = 100; % # measurements at each position: can be 50 or 100 to use 1 channel or 2
+D = meas * M * N; % dimensionality of data
+sub = 0.2; % fraction of data to keep after subsampling
+
+K = 1; % K nearest neighbors
+fracTrain = 0.1; % fraction of data to use for training
 
 %% Class 1 
-load(sprintf('cube_d%d.mat',D)); % load data, MM, NN
-M_cube = MM; % # rows
-N_cube = NN; % # columns
-data_cube = data; % D x M_cube x N_cube
+load(sprintf('cube_d%d.mat',meas)); % load data
+data_cube = data; % D x num_cube;
 num_cube = size(data_cube,2);
 
-
 %% Class 2
-load(sprintf('corner_d%d.mat',D)); % load data, MM, NN
-M_corner = MM; % # rows
-N_corner = NN; % # columns
-data_corner = data; % D x M_corner x N_corner
+load(sprintf('corner_d%d.mat',meas)); % load data
+data_corner = data; % D x num_corner
 num_corner = size(data_corner,2);
 
 num = num_cube + num_corner;
 
-%% Subsample frequencies
-D_sub = round(sub*D);
-idx_sub = sort(randperm(D,D_sub)); % sort so that order is from low freq to high freq
+%% subsample in frequency
+meas_sub = round(meas * sub);
+D_sub = round(D * sub);
 
-data_cube = data_cube(idx_sub,:,:);
-data_corner = data_corner(idx_sub,:,:);
+idx_sub = sort(randperm(meas, meas_sub));
 
-D = D_sub;
-
-%% Reshape data
-% Combine the returns from each row of measurements
-% into one large dimensional vector of size D*min(N_cube, N_corner)
-
-% data is currently shaped D x M x N
-% we reshape it to (D*N) x M
-% where N is min(N_cube, N_corner), since they have different number of 
-% measurements per row
-
-N_rshp = min(N_cube,N_corner);
-data_cube_rshp = zeros(D*N_rshp, M_cube);
-for i = 1:N_rshp
-    data_cube_rshp(D*(i-1)+1:D*i, :) = data_cube(:,:,i);
+data_cube_sub = zeros(D_sub, num_cube);
+i_sub = 1;
+for i = 1:meas:D
+    d = data_cube(i:i+meas-1 , :);
+    data_cube_sub(i_sub:i_sub+meas_sub-1,:) = d(idx_sub,:);
+    i_sub = i_sub + meas_sub;
 end
 
-data_corner_rshp = zeros(D*N_rshp, M_corner);
-for i = 1:N_rshp
-    data_corner_rshp(D*(i-1)+1:D*i, :) = data_corner(:,:,i);
+data_corner_sub = zeros(D_sub, num_corner);
+i_sub = 1;
+for i = 1:meas:D
+    d = data_corner(i:i+meas-1 , :);
+    data_corner_sub(i_sub:i_sub+meas_sub-1,:) = d(idx_sub,:);
+    i_sub = i_sub + meas_sub;
 end
 
-D = D*N_rshp;
 
 %% Create data matrix
-X = abs([data_cube_rshp data_corner_rshp]).'; % num x D
+X = abs([data_cube_sub data_corner_sub]).'; % num x D
 X = X - ones(num,1)*mean(X,1);
 X = X ./ (ones(num,1)*var(X,1));
 Y = [zeros(1,num_cube) ones(1,num_corner)].'; % 0 = cube, 1 = corner

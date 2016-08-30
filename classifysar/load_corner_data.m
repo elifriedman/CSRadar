@@ -1,9 +1,11 @@
-D = 100;
+D = 50;
 
-MM = 22; % rows
-NN = 23; % columns
+MM = 15; % rows
+NN = 15; % columns
 N = 19; % # of datapoints
 
+% 77 .. 91
+% 72 .. 408
 filename={...
     '23','22','21','20','19','18','17','16','15','14','13','12','11','10','9','8','7','6','5','4','3','2','1'...
     ,'24','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47'...
@@ -30,8 +32,15 @@ filename={...
 
 data = zeros(D*MM*NN, N);
 
-for ii = 1:length(filename)
-    data(D*(i-1)+1:D*i,:) = obtain_cubeNcorner_mat(sprintf('Cornaer_Ref_EXP/%s.csv',filename{ii}),2);
+% extract the middle 15 x 15
+% to make it compatible with the cube dataset
+ct = 1;
+for ii = 4 + 0:23:23*15
+    for jj = 0:14
+        i = ii + jj;
+        data(D*(ct-1)+1:D*ct,:) = obtain_cubeNcorner_mat(sprintf('Cornaer_Ref_EXP/%s.csv',filename{i}));
+        ct = ct + 1;
+    end
 end
 
 save(sprintf('corner_d%d.mat',D),'data','MM','NN','N');
