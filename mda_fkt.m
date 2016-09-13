@@ -1,7 +1,7 @@
 function [ Q,V] = mda_fkt( A_train)
 %UNTITLED3 Summary of this function goes here
 %   ALGORITHM 2 - COMPUTE QR DECOMPOSITION FOR MDA/FKT APPROACH
-% A_train contains a 1xC cell array where C is the number of columns. Each
+% A_train contains a 1xC cell array where C is the number of classes. Each
 % cell contains a D x num_samples matrix where D is dimensionality of data
 % and num_samples is the number of samples in the class.
 %
