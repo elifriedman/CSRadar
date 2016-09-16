@@ -8,14 +8,14 @@ D = meas * M * N; % dimensionality of data
 K = 1; % K nearest neighbors
 fracTrain = 0.2; % fraction of data to use for training
 
+f = 100; % # of frequency measurements
+k = 3; % length of grid to include in one datapoint
 %% Class 1 
-load(sprintf('cube_d%d.mat',meas)); % load data
-data_cube = data; % D x num_cube;
+data_cube = load_cube_data(f, k, 1:f); % D x num_cube;
 num_cube = size(data_cube,2);
 
 %% Class 2
-load(sprintf('corner_d%d.mat',meas)); % load data
-data_corner = data; % D x num_corner
+data_corner = load_corner_data(f, k, 1:f); % D x num_corner
 num_corner = size(data_corner,2);
 
 num = num_cube + num_corner;

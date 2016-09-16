@@ -11,43 +11,21 @@ sub = 0.2; % fraction of data to keep after subsampling
 K = 1; % K nearest neighbors
 fracTrain = 0.1; % fraction of data to use for training
 
+f = 100; % # of frequency measurements
+k = 3; % length of grid to include in one datapoint
+idx = sort(randperm(f, round(sub*f)));
 %% Class 1 
-load(sprintf('cube_d%d.mat',meas)); % load data
-data_cube = data; % D x num_cube;
+data_cube = load_cube_data(f, k, idx); % D x num_cube;
 num_cube = size(data_cube,2);
 
 %% Class 2
-load(sprintf('corner_d%d.mat',meas)); % load data
-data_corner = data; % D x num_corner
+data_corner = load_corner_data(f, k, idx); % D x num_corner
 num_corner = size(data_corner,2);
 
 num = num_cube + num_corner;
 
-%% subsample in frequency
-meas_sub = round(meas * sub);
-D_sub = round(D * sub);
-
-idx_sub = sort(randperm(meas, meas_sub));
-
-data_cube_sub = zeros(D_sub, num_cube);
-i_sub = 1;
-for i = 1:meas:D
-    d = data_cube(i:i+meas-1 , :);
-    data_cube_sub(i_sub:i_sub+meas_sub-1,:) = d(idx_sub,:);
-    i_sub = i_sub + meas_sub;
-end
-
-data_corner_sub = zeros(D_sub, num_corner);
-i_sub = 1;
-for i = 1:meas:D
-    d = data_corner(i:i+meas-1 , :);
-    data_corner_sub(i_sub:i_sub+meas_sub-1,:) = d(idx_sub,:);
-    i_sub = i_sub + meas_sub;
-end
-
-
 %% Create data matrix
-X = abs([data_cube_sub data_corner_sub]).'; % num x D
+X = abs([data_cube data_corner]).'; % num x D
 X = X - ones(num,1)*mean(X,1);
 X = X ./ (ones(num,1)*var(X,1));
 Y = [zeros(1,num_cube) ones(1,num_corner)].'; % 0 = cube, 1 = corner
